@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ match.home_team }} vs {{ match.away_team }} · Football Predictor</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <main class="shell detail-shell">
+    <a class="back-link" href="/">← Toutes les rencontres</a>
+    <header class="match-hero">
+      <p class="eyebrow">MATCH ANALYSIS · {{ match.league }}</p>
+      <h1>{{ match.home_team }} <span>vs</span> {{ match.away_team }}</h1>
+      <p class="match-date">{{ match.date|string|replace('T', ' ')|truncate(16, True, '') }}</p>
+    </header>
+
+    <section class="detail-grid">
+      <article class="panel detail-panel primary-market">
+        <p class="eyebrow">1X2</p><h2>Résultat du match</h2>
+        <div class="big-probs">
+          <div><small>DOMICILE</small><strong>{{ '%.1f'|format(prediction.home_probability * 100) }}%</strong></div>
+          <div><small>NUL</small><strong>{{ '%.1f'|format(prediction.draw_probability * 100) }}%</strong></div>
+          <div><small>EXTÉRIEUR</small><strong>{{ '%.1f'|format(prediction.away_probability * 100) }}%</strong></div>
+        </div>
+        <div class="chart-bars" aria-label="Graphique des probabilités 1X2">
+          <div class="chart-line"><span>DOM</span><i style="--value: {{ prediction.home_probability * 100 }}%"></i><b>{{ '%.1f'|format(prediction.home_probability * 100) }}%</b></div>
+          <div class="chart-line"><span>NUL</span><i class="draw-bar" style="--value: {{ prediction.draw_probability * 100 }}%"></i><b>{{ '%.1f'|format(prediction.draw_probability * 100) }}%</b></div>
+          <div class="chart-line"><span>EXT</span><i class="away-bar" style="--value: {{ prediction.away_probability * 100 }}%"></i><b>{{ '%.1f'|format(prediction.away_probability * 100) }}%</b></div>
+        </div>
+        <div class="curve-chart" role="img" aria-label="Courbe des probabilités 1X2">
+          <svg viewBox="0 0 320 150" preserveAspectRatio="none">
+            <path class="curve-grid" d="M20 20H300 M20 75H300 M20 130H300"></path>
+            <polyline class="curve-line" points="30,{{ 130 - prediction.home_probability * 110 }} 160,{{ 130 - prediction.draw_probability * 110 }} 290,{{ 130 - prediction.away_probability * 110 }}"></polyline>
+            <circle cx="30" cy="{{ 130 - prediction.home_probability * 110 }}" r="5"></circle><circle cx="160" cy="{{ 130 - prediction.draw_probability * 110 }}" r="5"></circle><circle cx="290" cy="{{ 130 - prediction.away_probability * 110 }}" r="5"></circle>
+          </svg>
+          <div class="curve-labels"><span>DOMICILE</span><span>NUL</span><span>EXTÉRIEUR</span></div>
+        </div>
+        <p class="pick">Pronostic principal : <b>{{ prediction.winner|upper }}</b> · confiance {{ '%.1f'|format(prediction.confidence * 100) }}%</p>
+      </article>
+
+      <article class="panel detail-panel">
+        <p class="eyebrow">GOALS</p><h2>Over / Under 2.5</h2>
+        <div class="market-result"><strong>{{ prediction.markets.over_under_2_5.pick|upper }}</strong><span>{{ '%.1f'|format(prediction.markets.over_under_2_5.over * 100) }}% Over · {{ '%.1f'|format(prediction.markets.over_under_2_5.under * 100) }}% Under</span></div>
+        <div class="market-chart"><div><span>OVER</span><i style="--value: {{ prediction.markets.over_under_2_5.over * 100 }}%"></i></div><div><span>UNDER</span><i class="dark-bar" style="--value: {{ prediction.markets.over_under_2_5.under * 100 }}%"></i></div></div>
+        <div class="mini-curve"><svg viewBox="0 0 260 90" preserveAspectRatio="none"><path class="curve-grid" d="M15 15H245 M15 75H245"></path><polyline class="curve-line" points="25,{{ 75 - prediction.markets.over_under_2_5.over * 55 }} 235,{{ 75 - prediction.markets.over_under_2_5.under * 55 }}"></polyline><circle cx="25" cy="{{ 75 - prediction.markets.over_under_2_5.over * 55 }}" r="4"></circle><circle cx="235" cy="{{ 75 - prediction.markets.over_under_2_5.under * 55 }}" r="4"></circle></svg><div class="curve-labels"><span>OVER</span><span>UNDER</span></div></div>
+        <p class="expected">Buts attendus : <b>{{ '%.2f'|format(prediction.markets.expected_goals.total) }}</b></p>
+      </article>
+
+      <article class="panel detail-panel">
+        <p class="eyebrow">BOTH TEAMS TO SCORE</p><h2>Les deux équipes marquent</h2>
+        <div class="market-result"><strong>{{ prediction.markets.btts.pick|upper }}</strong><span>{{ '%.1f'|format(prediction.markets.btts.yes * 100) }}% Oui · {{ '%.1f'|format(prediction.markets.btts.no * 100) }}% Non</span></div>
+        <div class="market-chart"><div><span>OUI</span><i style="--value: {{ prediction.markets.btts.yes * 100 }}%"></i></div><div><span>NON</span><i class="dark-bar" style="--value: {{ prediction.markets.btts.no * 100 }}%"></i></div></div>
+        <div class="mini-curve"><svg viewBox="0 0 260 90" preserveAspectRatio="none"><path class="curve-grid" d="M15 15H245 M15 75H245"></path><polyline class="curve-line" points="25,{{ 75 - prediction.markets.btts.yes * 55 }} 235,{{ 75 - prediction.markets.btts.no * 55 }}"></polyline><circle cx="25" cy="{{ 75 - prediction.markets.btts.yes * 55 }}" r="4"></circle><circle cx="235" cy="{{ 75 - prediction.markets.btts.no * 55 }}" r="4"></circle></svg><div class="curve-labels"><span>OUI</span><span>NON</span></div></div>
+      </article>
+
+      <article class="panel detail-panel exact-panel">
+        <p class="eyebrow">EXACT SCORE</p><h2>Scores les plus probables</h2>
+        {% for score in prediction.markets.exact_score %}
+          <div class="exact-row"><b>{{ score.score }}</b><div class="score-track"><i style="--value: {{ score.probability * 100 }}%"></i></div><span>{{ '%.1f'|format(score.probability * 100) }}%</span></div>
+        {% endfor %}
+        <div class="mini-curve score-curve"><svg viewBox="0 0 320 90" preserveAspectRatio="none"><path class="curve-grid" d="M15 15H305 M15 75H305"></path><polyline class="curve-line" points="25,{{ 75 - prediction.markets.exact_score[0].probability * 55 }} 160,{{ 75 - prediction.markets.exact_score[1].probability * 55 }} 295,{{ 75 - prediction.markets.exact_score[2].probability * 55 }}"></polyline>{% for score in prediction.markets.exact_score %}<circle cx="{{ 25 + loop.index0 * 135 }}" cy="{{ 75 - score.probability * 55 }}" r="4"></circle>{% endfor %}</svg><div class="curve-labels"><span>{{ prediction.markets.exact_score[0].score }}</span><span>{{ prediction.markets.exact_score[1].score }}</span><span>{{ prediction.markets.exact_score[2].score }}</span></div></div>
+      </article>
+    </section>
+  </main>
+</body>
+</html>

@@ -1,0 +1,6 @@
+match_id,competition,league,season,date,home_team,away_team,home_goals,away_goals,target,home_form,away_form,home_xg,away_xg,home_team_strength,away_team_strength,home_form_delta,away_form_delta,xg_delta,goals_delta,strength_delta,goal_expectation_home,goal_expectation_away,risk_index,is_derby
+560542,Premier League,Premier League,2026,2026-08-21T19:00:00Z,Arsenal FC,Coventry City FC,3,0,2,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,3,0.0,1.2,1.0,0.30000000000000004,False
+560543,Premier League,Premier League,2026,2026-08-22T11:30:00Z,Hull City AFC,Manchester United FC,2,0,2,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,2,0.0,1.2,1.0,0.2,False
+560544,Premier League,Premier League,2026,2026-08-22T14:00:00Z,Ipswich Town FC,Sunderland AFC,2,1,2,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,1,0.0,1.2,1.0,0.1,False
+560545,Premier League,Premier League,2026,2026-08-22T14:00:00Z,Nottingham Forest FC,Leeds United FC,0,1,0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,-1,0.0,1.2,1.0,0.1,False
+560546,Premier League,Premier League,2026,2026-08-22T14:00:00Z,Everton FC,Crystal Palace FC,2,0,2,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,2,0.0,1.2,1.0,0.2,False

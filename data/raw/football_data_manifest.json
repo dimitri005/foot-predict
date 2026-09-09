@@ -1,0 +1,20 @@
+{
+  "source": "Football-Data.org",
+  "downloaded_at": "2026-09-08",
+  "rows": 3539,
+  "competitions": [
+    "Bundesliga",
+    "Campeonato Brasileiro S\u00e9rie A",
+    "Championship",
+    "Eredivisie",
+    "European Championship",
+    "Ligue 1",
+    "Premier League",
+    "Primeira Liga",
+    "Primera Division",
+    "Serie A",
+    "UEFA Champions League"
+  ],
+  "date_min": "2024-04-13T21:30:00+00:00",
+  "date_max": "2025-05-31T19:00:00+00:00"
+}

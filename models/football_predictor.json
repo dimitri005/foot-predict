@@ -1,0 +1,52 @@
+{
+  "model_version": "1.1.0",
+  "feature_columns": [
+    "home_elo",
+    "away_elo",
+    "elo_delta",
+    "home_form_5",
+    "away_form_5",
+    "home_goals_for_5",
+    "away_goals_for_5",
+    "home_goals_against_5",
+    "away_goals_against_5",
+    "home_home_points_5",
+    "away_away_points_5",
+    "rest_days_home",
+    "rest_days_away"
+  ],
+  "labels": {
+    "0": "away",
+    "1": "draw",
+    "2": "home"
+  },
+  "metrics": {
+    "selected_model": "logistic_regression",
+    "accuracy": 0.4971751412429379,
+    "balanced_accuracy": 0.46062537940200005,
+    "log_loss": 1.018376811560924,
+    "brier_score": 0.6086821190054383,
+    "train_rows": 2831,
+    "test_rows": 708,
+    "candidate_metrics": {
+      "logistic_regression": {
+        "accuracy": 0.4971751412429379,
+        "balanced_accuracy": 0.46062537940200005,
+        "log_loss": 1.018376811560924,
+        "brier_score": 0.6086821190054383
+      },
+      "hist_gradient_boosting": {
+        "accuracy": 0.4872881355932203,
+        "balanced_accuracy": 0.4352307111121103,
+        "log_loss": 1.0894452680099864,
+        "brier_score": 0.6406159379937846
+      },
+      "calibrated_gradient_boosting": {
+        "accuracy": 0.4943502824858757,
+        "balanced_accuracy": 0.40894268729447764,
+        "log_loss": 1.028625670511584,
+        "brier_score": 0.6177420952972784
+      }
+    }
+  }
+}

@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Football Predictor</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <main class="shell">
+    <header class="hero">
+      <div>
+        <p class="eyebrow">MATCH INTELLIGENCE / 1X2</p>
+        <h1>Football<br><span>Predictor</span></h1>
+        <p class="lede">Des probabilités lisibles, alimentées par la forme historique et l’avantage terrain.</p>
+      </div>
+      <div class="status-card">
+        <span class="status-dot"></span>
+        <div><small>ENGINE STATUS</small><strong>{{ model }}</strong></div>
+      </div>
+    </header>
+
+    <section class="toolbar">
+      <div>
+        <p class="eyebrow">COMPETITION</p>
+        <h2>{{ selected_league or 'Toutes les compétitions' }}</h2>
+      </div>
+      <form class="league-form" method="get">
+        <label for="league">Choisir un championnat</label>
+        <select id="league" name="league" onchange="this.form.submit()">
+          {% for league in leagues %}
+            <option value="{{ league }}" {% if league == selected_league %}selected{% endif %}>{{ league }}</option>
+          {% endfor %}
+        </select>
+      </form>
+    </section>
+
+    <section class="kpi-grid" aria-label="Indicateurs clés">
+      <div class="kpi-card"><span class="kpi-icon">01</span><small>MATCHS DISPONIBLES</small><strong>{{ kpis.matches }}</strong><em>dans ce championnat</em></div>
+      <div class="kpi-card"><span class="kpi-icon cyan">02</span><small>CONFIANCE MOYENNE</small><strong>{{ '%.0f'|format(kpis.average_confidence * 100) }}%</strong><em>sur les prédictions</em></div>
+      <div class="kpi-card"><span class="kpi-icon pink">03</span><small>BUTS ATTENDUS</small><strong>{{ '%.2f'|format(kpis.average_goals) }}</strong><em>par rencontre</em></div>
+      <div class="kpi-card"><span class="kpi-icon">04</span><small>COMPÉTITIONS ACTIVES</small><strong>{{ kpis.competitions }}</strong><em>connectées au moteur</em></div>
+    </section>
+
+    {% if predictions %}
+    {% set main = predictions[0] %}
+    <section class="circle-grid" aria-label="Diagrammes circulaires">
+      <article class="panel circle-panel">
+        <div class="panel-heading"><div><p class="eyebrow">MATCH LEAD</p><h2>1X2</h2></div><span class="badge">{{ main.home_team }} vs {{ main.away_team }}</span></div>
+        <div class="circle-layout"><div class="donut donut-1x2" style="--home: {{ main.home_probability * 100 }}%; --draw: {{ (main.home_probability + main.draw_probability) * 100 }}%;"><span>{{ main.winner|upper }}</span></div><div class="legend"><p><i class="legend-home"></i>Domicile <b>{{ '%.0f'|format(main.home_probability * 100) }}%</b></p><p><i class="legend-draw"></i>Nul <b>{{ '%.0f'|format(main.draw_probability * 100) }}%</b></p><p><i class="legend-away"></i>Extérieur <b>{{ '%.0f'|format(main.away_probability * 100) }}%</b></p></div></div>
+      </article>
+      <article class="panel circle-panel">
+        <div class="panel-heading"><div><p class="eyebrow">GOAL LINE</p><h2>O/U 2.5</h2></div><span class="badge">{{ main.markets.over_under_2_5.pick|upper }}</span></div>
+        <div class="circle-layout"><div class="donut donut-goals" style="--primary: {{ main.markets.over_under_2_5.over * 100 }}%;"><span>{{ '%.0f'|format(main.markets.over_under_2_5.over * 100) }}%</span></div><div class="legend"><p><i class="legend-home"></i>Over <b>{{ '%.0f'|format(main.markets.over_under_2_5.over * 100) }}%</b></p><p><i class="legend-away"></i>Under <b>{{ '%.0f'|format(main.markets.over_under_2_5.under * 100) }}%</b></p><small>projection de buts</small></div></div>
+      </article>
+      <article class="panel circle-panel">
+        <div class="panel-heading"><div><p class="eyebrow">SCORING SIGNAL</p><h2>BTTS</h2></div><span class="badge">{{ main.markets.btts.pick|upper }}</span></div>
+        <div class="circle-layout"><div class="donut donut-btts" style="--primary: {{ main.markets.btts.yes * 100 }}%;"><span>{{ '%.0f'|format(main.markets.btts.yes * 100) }}%</span></div><div class="legend"><p><i class="legend-home"></i>Oui <b>{{ '%.0f'|format(main.markets.btts.yes * 100) }}%</b></p><p><i class="legend-away"></i>Non <b>{{ '%.0f'|format(main.markets.btts.no * 100) }}%</b></p><small>les deux équipes marquent</small></div></div>
+      </article>
+    </section>
+    {% endif %}
+
+    <section class="grid">
+      <article class="panel fixtures">
+        <div class="panel-heading"><div><p class="eyebrow">UP NEXT</p><h2>Fixtures</h2></div><span class="count">{{ matches|length }}</span></div>
+        {% for match in matches %}
+          <a class="fixture fixture-link" href="{{ url_for('match_detail', match_id=match.match_id) }}">
+            <time>{{ match.date[:10] if match.date else 'Date à confirmer' }}</time>
+            <div class="teams"><strong>{{ match.home_team }}</strong><span>vs</span><strong>{{ match.away_team }}</strong></div>
+            <span class="competition">{{ match.league }}</span>
+            <span class="open-match">Voir l’analyse →</span>
+          </a>
+        {% else %}
+          <p class="empty">Aucun match téléchargé pour ce championnat. Réessaie après une actualisation API.</p>
+        {% endfor %}
+      </article>
+
+      <article class="panel predictions">
+        <div class="panel-heading"><div><p class="eyebrow">MODEL OUTPUT</p><h2>Probabilités</h2></div><span class="badge">{{ model }}</span></div>
+        {% for prediction in predictions %}
+          <div class="prediction">
+            <div class="prediction-top"><strong>{{ prediction.home_team }} <em>vs</em> {{ prediction.away_team }}</strong><span>{{ prediction.confidence_label }}</span></div>
+            <div class="probability-row">
+              <div><small>HOME</small><b>{{ '%.0f'|format(prediction.home_probability * 100) }}%</b></div>
+              <div><small>DRAW</small><b>{{ '%.0f'|format(prediction.draw_probability * 100) }}%</b></div>
+              <div><small>AWAY</small><b>{{ '%.0f'|format(prediction.away_probability * 100) }}%</b></div>
+            </div>
+            <div class="bar"><i style="width: {{ prediction.home_probability * 100 }}%"></i><i style="width: {{ prediction.draw_probability * 100 }}%"></i><i style="width: {{ prediction.away_probability * 100 }}%"></i></div>
+            <p class="pick">Lean: <strong>{{ prediction.winner }}</strong> · confiance {{ '%.0f'|format(prediction.confidence * 100) }}%</p>
+            <div class="market-grid">
+              <div><small>O/U 2.5</small><b>{{ prediction.markets.over_under_2_5.pick|upper }}</b><span>{{ '%.0f'|format(prediction.markets.over_under_2_5.over * 100) }}% over</span></div>
+              <div><small>BTTS</small><b>{{ prediction.markets.btts.pick|upper }}</b><span>{{ '%.0f'|format(prediction.markets.btts.yes * 100) }}% yes</span></div>
+              <div><small>EXACT</small><b>{{ prediction.markets.exact_score[0].score }}</b><span>{{ '%.0f'|format(prediction.markets.exact_score[0].probability * 100) }}%</span></div>
+            </div>
+          </div>
+        {% else %}
+          <p class="empty">Aucune prédiction disponible pour ce championnat.</p>
+        {% endfor %}
+      </article>
+    </section>
+
+    <footer><span>FOOT-PREDICT</span><a href="/health">health check</a><a href="/api/predictions">JSON API</a></footer>
+  </main>
+</body>
+</html>
