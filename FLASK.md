@@ -66,3 +66,22 @@ C:\Users\kenmo\Downloads\FOOT-PREDICT
 
 The scheduled task needs access to the project `.env` file. Retrain the model
 separately, for example once per week, with `scripts/update_pipeline.ps1`.
+
+## GitHub Actions Refresh
+
+The repository also contains `.github/workflows/daily-refresh.yml`. It runs at
+05:00 UTC every day, which is 06:00 in `Africa/Lagos`, and commits updated
+fixtures to `data/raw/matches_2026.csv`.
+
+In GitHub, add this repository secret:
+
+```text
+Settings -> Secrets and variables -> Actions -> New repository secret
+Name: FOOTBALL_DATA_API_KEY
+Value: your API token
+```
+
+You can run it immediately from **Actions -> Daily Match Refresh -> Run
+workflow**. Scheduled GitHub Actions can start a few minutes late, so the
+Windows Task Scheduler remains useful when the local application must refresh
+at an exact time.
