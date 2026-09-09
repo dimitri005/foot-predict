@@ -46,7 +46,15 @@ with:
 The script requests only today plus the next three days, merges by
 `match_id`, and preserves the old snapshot when the API returns no data.
 
-On Windows, create a Task Scheduler task:
+GitHub Actions is the primary refresh system. If you previously created the
+local Windows task, disable it from an **Administrator PowerShell**:
+
+```powershell
+schtasks /Change /TN "FOOT-PREDICT Daily Refresh" /DISABLE
+```
+
+The Windows script remains available as a manual fallback. To create that
+fallback task again, use:
 
 1. Open **Task Scheduler** and choose **Create Basic Task**.
 2. Choose **Daily**, for example at `06:00`.
@@ -82,6 +90,5 @@ Value: your API token
 ```
 
 You can run it immediately from **Actions -> Daily Match Refresh -> Run
-workflow**. Scheduled GitHub Actions can start a few minutes late, so the
-Windows Task Scheduler remains useful when the local application must refresh
-at an exact time.
+workflow**. Scheduled GitHub Actions can start a few minutes late, but it is
+the primary refresh system for this project.
