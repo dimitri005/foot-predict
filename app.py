@@ -159,5 +159,6 @@ if __name__ == "__main__":
         from waitress import serve
     except ModuleNotFoundError:
         raise SystemExit("Install dependencies with 'pip install -r requirements.txt' before starting Flask")
-    print("Football Predictor running at http://127.0.0.1:5000", flush=True)
-    serve(app, host="0.0.0.0", port=5000)
+    port = int(os.getenv("PORT", "5000"))
+    print(f"Football Predictor running at http://0.0.0.0:{port}", flush=True)
+    serve(app, host="0.0.0.0", port=port)

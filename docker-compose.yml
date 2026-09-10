@@ -1,0 +1,16 @@
+services:
+  football-predictor:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "${HOST_PORT:-5000}:5000"
+    environment:
+      PORT: 5000
+      LIVE_CACHE_SECONDS: ${LIVE_CACHE_SECONDS:-900}
+      LIVE_REFRESH_ON_STARTUP: ${LIVE_REFRESH_ON_STARTUP:-false}
+      FOOTBALL_DATA_API_KEY: ${FOOTBALL_DATA_API_KEY:-}
+    volumes:
+      - ./data:/app/data
+      - ./models:/app/models
+    restart: unless-stopped
