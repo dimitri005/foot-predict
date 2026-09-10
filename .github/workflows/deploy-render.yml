@@ -1,0 +1,51 @@
+name: Deploy to Render
+
+on:
+  workflow_run:
+    workflows: ["Continuous Integration"]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: render-production
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    name: Trigger Render deployment
+    runs-on: ubuntu-latest
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.conclusion == 'success' &&
+       github.event.workflow_run.head_branch == 'main')
+
+    steps:
+      - name: Validate Render deploy hook
+        env:
+          RENDER_DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+        shell: bash
+        run: |
+          if [ -z "$RENDER_DEPLOY_HOOK_URL" ]; then
+            echo "Missing repository secret: RENDER_DEPLOY_HOOK_URL"
+            echo "Create a Render Deploy Hook and add it in GitHub Actions secrets."
+            exit 1
+          fi
+
+      - name: Trigger Render deployment
+        env:
+          RENDER_DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+        shell: bash
+        run: |
+          status_code=$(curl --fail-with-body --silent --show-error \
+            --output /tmp/render-response.txt \
+            --write-out "%{http_code}" \
+            --request POST "$RENDER_DEPLOY_HOOK_URL")
+          echo "Render deploy hook response: HTTP ${status_code}"
+          if [ "$status_code" -lt 200 ] || [ "$status_code" -ge 300 ]; then
+            cat /tmp/render-response.txt
+            exit 1
+          fi
