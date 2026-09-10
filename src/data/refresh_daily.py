@@ -17,7 +17,7 @@ LOGGER = logging.getLogger(__name__)
 def refresh_daily(window_days: int = 3, delay_seconds: float = 1.0) -> pd.DataFrame:
     """Fetch fixtures in a rolling date window and merge them into the snapshot."""
     if not get_api_key():
-        raise RuntimeError("FOOTBALL_DATA_API_KEY is missing from .env")
+        raise RuntimeError("FOOTBALL_DATA_API_KEY is missing from the environment or .env")
     if window_days < 0:
         raise ValueError("window_days must be positive")
 
