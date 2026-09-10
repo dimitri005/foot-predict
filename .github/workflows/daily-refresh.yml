@@ -48,7 +48,8 @@ jobs:
       - name: Refresh today and upcoming fixtures
         env:
           FOOTBALL_DATA_API_KEY: ${{ secrets.FOOTBALL_DATA_API_KEY }}
-        run: python -m src.data.refresh_daily --window-days 3 --delay 1
+        # The free API quota is rate-limited; keep requests spaced out.
+        run: python -m src.data.refresh_daily --window-days 3 --delay 7
 
       - name: Commit updated snapshot
         shell: bash

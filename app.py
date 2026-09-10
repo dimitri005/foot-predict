@@ -90,6 +90,23 @@ def _dashboard_payload(league: str | None = None, force_refresh: bool = False) -
 
     matches = matches.copy()
     matches["date"] = pd.to_datetime(matches["date"], errors="coerce", utc=True)
+    # The snapshot also contains historical rows for training and auditing.
+    # The dashboard must only expose today's and upcoming fixtures.
+    today_utc = pd.Timestamp.now(tz="UTC").normalize()
+    matches = matches[matches["date"].notna() & (matches["date"] >= today_utc)]
+    if matches.empty:
+        return {
+            "matches": [],
+            "predictions": [],
+            "leagues": [],
+            "model": "unavailable",
+            "kpis": {
+                "matches": 0,
+                "competitions": 0,
+                "average_confidence": 0.0,
+                "average_goals": 0.0,
+            },
+        }
     available_from_data = {str(value) for value in matches["league"].dropna().unique()}
     leagues = sorted(set(COMPETITION_IDS.values()) | available_from_data)
     # Prefer a competition with downloaded fixtures on first load. The full

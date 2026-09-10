@@ -14,7 +14,7 @@ from src.data.api_client import COMPETITION_IDS, MATCHES_RAW_FILE, fetch_footbal
 LOGGER = logging.getLogger(__name__)
 
 
-def refresh_daily(window_days: int = 3, delay_seconds: float = 1.0) -> pd.DataFrame:
+def refresh_daily(window_days: int = 3, delay_seconds: float = 7.0) -> pd.DataFrame:
     """Fetch fixtures in a rolling date window and merge them into the snapshot."""
     if not get_api_key():
         raise RuntimeError("FOOTBALL_DATA_API_KEY is missing from the environment or .env")
@@ -58,7 +58,7 @@ def refresh_daily(window_days: int = 3, delay_seconds: float = 1.0) -> pd.DataFr
 def main() -> int:
     parser = argparse.ArgumentParser(description="Refresh daily football fixtures")
     parser.add_argument("--window-days", type=int, default=3)
-    parser.add_argument("--delay", type=float, default=1.0)
+    parser.add_argument("--delay", type=float, default=7.0)
     args = parser.parse_args()
     refresh_daily(args.window_days, args.delay)
     return 0
