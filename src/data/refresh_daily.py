@@ -38,8 +38,10 @@ def refresh_daily(window_days: int = 3, delay_seconds: float = 7.0) -> pd.DataFr
 
     fresh = pd.DataFrame(rows)
     if fresh.empty:
-        LOGGER.warning("No fixtures returned; preserving the existing snapshot")
-        return pd.read_csv(MATCHES_RAW_FILE) if MATCHES_RAW_FILE.exists() else fresh
+        raise RuntimeError(
+            "No fixtures returned by Football-Data.org. "
+            "The snapshot was not updated; check the API key, quota, and date window."
+        )
 
     if MATCHES_RAW_FILE.exists():
         existing = pd.read_csv(MATCHES_RAW_FILE)

@@ -85,8 +85,22 @@ def _prediction_frame(matches: pd.DataFrame) -> pd.DataFrame:
 
 def _dashboard_payload(league: str | None = None, force_refresh: bool = False) -> dict[str, Any]:
     matches = _load_matches(force_refresh=force_refresh)
+    all_leagues = sorted(COMPETITION_IDS.values())
     if matches.empty:
-        return {"matches": [], "predictions": [], "leagues": [], "model": "unavailable", "kpis": {"matches": 0, "competitions": 0, "average_confidence": 0.0, "average_goals": 0.0}}
+        selected = league if league in all_leagues else (all_leagues[0] if all_leagues else None)
+        return {
+            "matches": [],
+            "predictions": [],
+            "leagues": all_leagues,
+            "selected_league": selected,
+            "model": "unavailable",
+            "kpis": {
+                "matches": 0,
+                "competitions": len(all_leagues),
+                "average_confidence": 0.0,
+                "average_goals": 0.0,
+            },
+        }
 
     matches = matches.copy()
     matches["date"] = pd.to_datetime(matches["date"], errors="coerce", utc=True)
@@ -94,24 +108,25 @@ def _dashboard_payload(league: str | None = None, force_refresh: bool = False) -
     # The dashboard must only expose today's and upcoming fixtures.
     today_utc = pd.Timestamp.now(tz="UTC").normalize()
     matches = matches[matches["date"].notna() & (matches["date"] >= today_utc)]
+    available_from_data = {str(value) for value in matches["league"].dropna().unique()}
+    leagues = sorted(set(COMPETITION_IDS.values()) | available_from_data)
+    selected = league if league in leagues else (sorted(available_from_data)[0] if available_from_data else (leagues[0] if leagues else None))
     if matches.empty:
         return {
             "matches": [],
             "predictions": [],
-            "leagues": [],
+            "leagues": leagues,
+            "selected_league": selected,
             "model": "unavailable",
             "kpis": {
                 "matches": 0,
-                "competitions": 0,
+                "competitions": len(leagues),
                 "average_confidence": 0.0,
                 "average_goals": 0.0,
             },
         }
-    available_from_data = {str(value) for value in matches["league"].dropna().unique()}
-    leagues = sorted(set(COMPETITION_IDS.values()) | available_from_data)
     # Prefer a competition with downloaded fixtures on first load. The full
     # subscription list remains available in the selector.
-    selected = league if league in leagues else (sorted(available_from_data)[0] if available_from_data else (leagues[0] if leagues else None))
     filtered = matches[matches["league"] == selected] if selected else matches
     inference = _prediction_frame(filtered.head(20))
     predictor = FootballPredictor()
