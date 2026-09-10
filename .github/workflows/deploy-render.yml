@@ -2,7 +2,7 @@ name: Deploy to Render
 
 on:
   workflow_run:
-    workflows: ["Continuous Integration"]
+    workflows: ["Continuous Integration", "Daily Match Refresh"]
     types: [completed]
     branches: [main]
   workflow_dispatch:
